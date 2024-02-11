@@ -1,4 +1,7 @@
 package org.example.authentication.dto;
 
-public class BookDTO {
+import lombok.*;
+
+@Builder
+public record BookDTO(String title, String author, String ISBN) {
 }
