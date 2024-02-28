@@ -16,9 +16,14 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @GetMapping(value = "/borrow/{id}")
+    @GetMapping(value = "/{id}/borrow")
     public BookDto borrowBook(@PathVariable("id") String id) {
         return bookService.borrowBook(id);
+    }
+
+    @GetMapping(value = "/{id}/exists")
+    public void existsBook(@PathVariable("id") String id) {
+        bookService.exists(id);
     }
 
     @PostMapping(value = "/register")
