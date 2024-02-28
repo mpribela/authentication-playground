@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
 @ToString
 @EqualsAndHashCode
 @Document("book")
-public class BookDao {
+public class BookEntity {
     @Id
     private String id;
     private String title;

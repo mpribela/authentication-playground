@@ -1,25 +1,25 @@
 package org.example.authentication.transformer;
 
-import org.example.authentication.data.BookDao;
-import org.example.authentication.dto.BookDTO;
+import org.example.authentication.data.BookEntity;
+import org.example.authentication.dto.BookDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BookTransformer {
 
-    public BookDao toDao(BookDTO bookDTO) {
-        return BookDao.builder()
-                .title(bookDTO.title())
-                .author(bookDTO.author())
-                .ISBN(bookDTO.ISBN())
+    public BookEntity toEntity(BookDto bookDto) {
+        return BookEntity.builder()
+                .title(bookDto.title())
+                .author(bookDto.author())
+                .ISBN(bookDto.ISBN())
                 .build();
     }
 
-    public BookDTO toDTO(BookDao bookDao) {
-        return BookDTO.builder()
-                .author(bookDao.getAuthor())
-                .ISBN(bookDao.getISBN())
-                .title(bookDao.getTitle())
+    public BookDto toDTO(BookEntity bookEntity) {
+        return BookDto.builder()
+                .author(bookEntity.getAuthor())
+                .ISBN(bookEntity.getISBN())
+                .title(bookEntity.getTitle())
                 .build();
     }
 }

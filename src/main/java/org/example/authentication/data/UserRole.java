@@ -1,5 +1,5 @@
 package org.example.authentication.data;
 
 public enum UserRole {
-    ADMIN, READER;
+    ROLE_ADMIN, ROLE_READER
 }

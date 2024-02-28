@@ -1,9 +1,11 @@
 package org.example.authentication.controller;
 
-import org.example.authentication.dto.BookDTO;
+import lombok.extern.slf4j.Slf4j;
+import org.example.authentication.dto.BookDto;
 import org.example.authentication.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/book")
 public class BookController {
@@ -15,12 +17,12 @@ public class BookController {
     }
 
     @GetMapping(value = "/borrow/{id}")
-    public BookDTO borrowBook(@PathVariable("id") String id) {
+    public BookDto borrowBook(@PathVariable("id") String id) {
         return bookService.borrowBook(id);
     }
 
     @PostMapping(value = "/register")
-    public void registerBook(@RequestBody BookDTO bookDTO) {
+    public void registerBook(@RequestBody BookDto bookDTO) {
         bookService.registerBook(bookDTO);
     }
 }
