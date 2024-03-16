@@ -27,6 +27,13 @@ public class UserEntity implements UserDetails {
     public UserEntity() {
         super();
     }
+    public UserEntity(String id, String username, List<String> userRoles, boolean isEnabled) {
+        this.id = id;
+        this.username = username;
+        this.userRoles = userRoles.stream().map(UserRole::fromText).toList();
+        this.enabled = isEnabled;
+        this.password = "";
+    }
 
 
     @Override

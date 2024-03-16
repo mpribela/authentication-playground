@@ -28,11 +28,23 @@ public class BookService {
     }
 
     //todo make it transactional
-    public BookDto borrowBook(String id) {
-        BookEntity book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-        book.borrow();
+    public BookDto borrowBook(String bookId, String userId) {
+        BookEntity book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+        book.borrow(userId);
         bookRepository.save(book);
         return bookTransformer.toDTO(book);
+    }
+
+    //todo make it transactional
+    public void returnBook(String bookId, String userId) {
+        BookEntity book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+        boolean returned = book.returnBook();
+        bookRepository.save(book);
+        if (returned) {
+            log.info("Book with ID {} successfully returned by user {}.", bookId, userId);
+        } else {
+            log.info("Book with ID {} is already returned.", bookId);
+        }
     }
 
     public void registerBook(BookDto bookDTO) {
