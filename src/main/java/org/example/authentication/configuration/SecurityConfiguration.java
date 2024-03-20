@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +31,11 @@ public class SecurityConfiguration {
                             .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
                 .build();
+    }
+
+    @Bean
+    public BasicAuthenticationConverter authenticationConverter() {
+       return new BasicAuthenticationConverter();
     }
 
 }

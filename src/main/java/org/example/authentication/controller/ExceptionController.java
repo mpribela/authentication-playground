@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.ErrorDto;
 import org.example.authentication.exception.BookAlreadyBorrowedException;
 import org.example.authentication.exception.BookNotFoundException;
+import org.example.authentication.exception.JwtTokenCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -27,6 +28,14 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorDto handleBookAlreadyBorrowedException(BookAlreadyBorrowedException exception) {
         String errorMessage = MessageFormat.format("Book with id {0} is already borrowed.", exception.getId());
+        return ErrorDto.builder().message(errorMessage).build();
+    }
+
+    @ExceptionHandler(JwtTokenCreationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDto handleJwtTokenCreationException(JwtTokenCreationException exception) {
+        log.error("Unexpected error occurred during generating of JWT token.", exception);
+        String errorMessage = "Could not login user. Try login later.";
         return ErrorDto.builder().message(errorMessage).build();
     }
 

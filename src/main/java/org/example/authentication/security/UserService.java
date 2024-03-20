@@ -24,14 +24,6 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return getUser(username);
-    }
-
-    public UserEntity getUserEntityByUsername(String username) {
-        return getUser(username);
-    }
-
-    private UserEntity getUser(String username) {
         Optional<UserEntity> userResult = userRepository.findByUsername(username);
         return userResult.orElseThrow(() -> {
             log.info("Could not find a username '{}'.", username);

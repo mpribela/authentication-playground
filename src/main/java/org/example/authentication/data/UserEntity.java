@@ -1,6 +1,6 @@
 package org.example.authentication.data;
 
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +13,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString(exclude = "password")
 @Document("user")
 public class UserEntity implements UserDetails {
     @Id
@@ -24,9 +29,6 @@ public class UserEntity implements UserDetails {
     private OffsetDateTime lastLogin;
     private boolean enabled;
 
-    public UserEntity() {
-        super();
-    }
     public UserEntity(String id, String username, List<String> userRoles, boolean isEnabled) {
         this.id = id;
         this.username = username;

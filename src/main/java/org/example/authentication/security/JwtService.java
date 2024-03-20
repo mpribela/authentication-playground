@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.commons.lang3.BooleanUtils;
 import org.example.authentication.data.UserEntity;
+import org.example.authentication.exception.JwtTokenCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -32,15 +33,19 @@ public class JwtService {
     }
 
     public String createJWT(UserEntity user) {
-        return JWT.create()
-                .withIssuer("myIssuer")
-                .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(5, MINUTES))
-                .withClaim("user", user.getUsername())
-                .withClaim("userId", user.getId())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                .withClaim("isEnabled", user.isEnabled())
-                .sign(algorithm);
+        try {
+            return JWT.create()
+                    .withIssuer("myIssuer")
+                    .withIssuedAt(Instant.now())
+                    .withExpiresAt(Instant.now().plus(5, MINUTES))
+                    .withClaim("user", user.getUsername())
+                    .withClaim("userId", user.getId())
+                    .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                    .withClaim("isEnabled", user.isEnabled())
+                    .sign(algorithm);
+        } catch (Exception exception) {
+            throw new JwtTokenCreationException(exception);
+        }
     }
 
     public void verifyJWT(String jwt) {
