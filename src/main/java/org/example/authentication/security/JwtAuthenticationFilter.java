@@ -38,8 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         String token = StringUtils.removeStart(authorizationHeader, BEARER_PREFIX);
-        jwtService.verifyJWT(token);
-        UserEntity user = jwtService.extractUserDetails(token);
+        UserEntity user = jwtService.getUser(token);
         request.setAttribute(USER_ID_ATTRIBUTE, user.getId());
         setSecurityContext(user);
         filterChain.doFilter(request, response);

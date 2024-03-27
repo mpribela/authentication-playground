@@ -5,14 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.example.authentication.data.UserEntity;
 import org.example.authentication.exception.JwtTokenCreationException;
+import org.example.authentication.exception.JwtTokenIsEmptyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.List;
 
@@ -23,19 +23,21 @@ public class JwtService {
 
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
+    private final String issuer;
 
-    public JwtService(@Value("${classpath:keys/public_key.pem}") RSAPublicKey rsaPublicKey,
-                      @Value("${classpath:keys/private_key.pem}") RSAPrivateKey rsaPrivateKey) {
-        this.algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey);
-        this.verifier = JWT.require(algorithm)
-                .withIssuer("myIssuer")
-                .build();
+    public JwtService(Algorithm algorithm, JWTVerifier verifier, @Value("${authentication.jwt.issuer}") String issuer) {
+        this.algorithm = algorithm;
+        this.verifier = verifier;
+        this.issuer = issuer;
     }
 
-    public String createJWT(UserEntity user) {
+    public String createToken(UserEntity user) {
+        if (user == null) {
+            throw new JwtTokenCreationException("User is null.");
+        }
         try {
             return JWT.create()
-                    .withIssuer("myIssuer")
+                    .withIssuer(issuer)
                     .withIssuedAt(Instant.now())
                     .withExpiresAt(Instant.now().plus(5, MINUTES))
                     .withClaim("user", user.getUsername())
@@ -48,16 +50,19 @@ public class JwtService {
         }
     }
 
-    public void verifyJWT(String jwt) {
-        verifier.verify(jwt);
+    public UserEntity getUser(String token) {
+        if (StringUtils.isBlank(token)) {
+            throw new JwtTokenIsEmptyException();
+        }
+        DecodedJWT decodedToken = verifier.verify(token);
+        return extractUserDetails(decodedToken);
     }
 
-    public UserEntity extractUserDetails(String jwt) {
-        DecodedJWT decoded = JWT.decode(jwt);
-        String id = decoded.getClaim("userId").asString();
-        String user = decoded.getClaim("user").asString();
-        List<String> roles = decoded.getClaim("roles").asList(String.class);
-        boolean isEnabled = BooleanUtils.toBooleanDefaultIfNull(decoded.getClaim("user").asBoolean(), false);
+    private UserEntity extractUserDetails(DecodedJWT decodedToken) {
+        String id = decodedToken.getClaim("userId").asString();
+        String user = decodedToken.getClaim("user").asString();
+        List<String> roles = decodedToken.getClaim("roles").asList(String.class);
+        boolean isEnabled = BooleanUtils.toBooleanDefaultIfNull(decodedToken.getClaim("user").asBoolean(), false);
         return new UserEntity(id, user, roles, isEnabled);
     }
 

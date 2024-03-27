@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void verify(@RequestBody TokenDto tokenDto) {
-        jwtService.verifyJWT(tokenDto.getJwt());
+        jwtService.getUser(tokenDto.getJwt());
     }
 
 

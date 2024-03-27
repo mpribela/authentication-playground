@@ -25,7 +25,7 @@ public class LoginService {
     public String login(HttpServletRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken = authenticationConverter.convert(request);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        return jwtService.createJWT((UserEntity) authentication.getPrincipal());
+        return jwtService.createToken((UserEntity) authentication.getPrincipal());
     }
 
 }

@@ -49,7 +49,7 @@ class LoginServiceTest {
         given(authenticationManager.authenticate(authenticationToken)).willReturn(authenticationResult);
         UserEntity user = EntityBuilder.createUser().enabled(true).build();
         given(authenticationResult.getPrincipal()).willReturn(user);
-        given(jwtService.createJWT(user)).willReturn(jwt);
+        given(jwtService.createToken(user)).willReturn(jwt);
 
         //when
         String result = service.login(request);
@@ -102,7 +102,7 @@ class LoginServiceTest {
         given(authenticationManager.authenticate(authenticationToken)).willReturn(authenticationResult);
         UserEntity user = EntityBuilder.createUser().enabled(true).build();
         given(authenticationResult.getPrincipal()).willReturn(user);
-        given(jwtService.createJWT(user)).willThrow(JwtTokenCreationException.class);
+        given(jwtService.createToken(user)).willThrow(JwtTokenCreationException.class);
 
         //when then
         assertThrows(JwtTokenCreationException.class, () -> service.login(request));
