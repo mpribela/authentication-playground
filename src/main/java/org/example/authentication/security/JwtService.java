@@ -62,7 +62,7 @@ public class JwtService {
         String id = decodedToken.getClaim("userId").asString();
         String user = decodedToken.getClaim("user").asString();
         List<String> roles = decodedToken.getClaim("roles").asList(String.class);
-        boolean isEnabled = BooleanUtils.toBooleanDefaultIfNull(decodedToken.getClaim("user").asBoolean(), false);
+        boolean isEnabled = BooleanUtils.toBooleanDefaultIfNull(decodedToken.getClaim("isEnabled").asBoolean(), false);
         return new UserEntity(id, user, roles, isEnabled);
     }
 
