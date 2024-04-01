@@ -2,6 +2,7 @@ package org.example.authentication.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.BookDto;
+import org.example.authentication.dto.RegisterBookDto;
 import org.example.authentication.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,27 +20,27 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @PostMapping(value = "/{bookId}/borrow")
+    @PostMapping(value = "/{ISBN}/borrow")
     @ResponseStatus(HttpStatus.OK)
-    public BookDto borrowBook(@PathVariable("bookId") String bookId,
+    public BookDto borrowBook(@PathVariable("ISBN") String ISBN,
                               @RequestAttribute(USER_ID_ATTRIBUTE) String userId) {
-        return bookService.borrowBook(bookId, userId);
+        return bookService.borrowBook(ISBN, userId);
     }
 
-    @PostMapping(value = "/{bookId}/return")
+    @PostMapping(value = "/{ISBN}/return")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void returnBook(@PathVariable("bookId") String bookId,
+    public void returnBook(@PathVariable("ISBN") String ISBN,
                               @RequestAttribute(USER_ID_ATTRIBUTE) String userId) {
-        bookService.returnBook(bookId, userId);
+        bookService.returnBook(ISBN, userId);
     }
 
-    @GetMapping(value = "/{bookId}/exists")
-    public void existsBook(@PathVariable("bookId") String bookId) {
-        bookService.exists(bookId);
+    @GetMapping(value = "/{ISBN}/exists")
+    public void existsBook(@PathVariable("ISBN") String ISBN) {
+        bookService.exists(ISBN);
     }
 
     @PostMapping(value = "/register")
-    public void registerBook(@RequestBody BookDto bookDTO) {
-        bookService.registerBook(bookDTO);
+    public void registerBook(@RequestBody RegisterBookDto registerBookDTO) {
+        bookService.registerBook(registerBookDTO);
     }
 }

@@ -7,16 +7,15 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.example.authentication.data.UserEntity;
-import org.example.authentication.exception.JwtTokenCreationException;
-import org.example.authentication.exception.JwtTokenIsEmptyException;
+import org.example.authentication.exception.jwt.JwtTokenCreationException;
+import org.example.authentication.exception.jwt.JwtTokenIsEmptyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-
-import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Component
 public class JwtService {
@@ -24,11 +23,15 @@ public class JwtService {
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private final String issuer;
+    private final Duration tokenDuration;
 
-    public JwtService(Algorithm algorithm, JWTVerifier verifier, @Value("${authentication.jwt.issuer}") String issuer) {
+    public JwtService(Algorithm algorithm, JWTVerifier verifier,
+                      @Value("${authentication.jwt.issuer}") String issuer,
+                      @Value("${authentication.jwt.expire-in}") Duration tokenDuration) {
         this.algorithm = algorithm;
         this.verifier = verifier;
         this.issuer = issuer;
+        this.tokenDuration = tokenDuration;
     }
 
     public String createToken(UserEntity user) {
@@ -39,7 +42,7 @@ public class JwtService {
             return JWT.create()
                     .withIssuer(issuer)
                     .withIssuedAt(Instant.now())
-                    .withExpiresAt(Instant.now().plus(5, MINUTES))
+                    .withExpiresAt(Instant.now().plus(tokenDuration))
                     .withClaim("user", user.getUsername())
                     .withClaim("userId", user.getId())
                     .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())

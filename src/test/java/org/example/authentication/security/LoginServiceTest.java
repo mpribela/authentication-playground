@@ -3,7 +3,7 @@ package org.example.authentication.security;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.authentication.builder.EntityBuilder;
 import org.example.authentication.data.UserEntity;
-import org.example.authentication.exception.JwtTokenCreationException;
+import org.example.authentication.exception.jwt.JwtTokenCreationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

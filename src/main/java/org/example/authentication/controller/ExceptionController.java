@@ -2,9 +2,9 @@ package org.example.authentication.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.ErrorDto;
-import org.example.authentication.exception.BookAlreadyBorrowedException;
-import org.example.authentication.exception.BookNotFoundException;
-import org.example.authentication.exception.JwtTokenCreationException;
+import org.example.authentication.exception.book.BookNotAvailableException;
+import org.example.authentication.exception.book.BookNotFoundException;
+import org.example.authentication.exception.jwt.JwtTokenCreationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,14 +20,14 @@ public class ExceptionController {
     @ExceptionHandler(BookNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDto handleBookNotFoundException(BookNotFoundException exception) {
-        String errorMessage = MessageFormat.format("Book with id {0} not found.", exception.getId());
+        String errorMessage = MessageFormat.format("Book with id {0} not found.", exception.getISBN());
         return ErrorDto.builder().message(errorMessage).build();
     }
 
-    @ExceptionHandler(BookAlreadyBorrowedException.class)
+    @ExceptionHandler(BookNotAvailableException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorDto handleBookAlreadyBorrowedException(BookAlreadyBorrowedException exception) {
-        String errorMessage = MessageFormat.format("Book with id {0} is already borrowed.", exception.getId());
+    public ErrorDto handleBookAlreadyBorrowedException(BookNotAvailableException exception) {
+        String errorMessage = MessageFormat.format("Book with id {0} is already borrowed.", exception.getISBN());
         return ErrorDto.builder().message(errorMessage).build();
     }
 

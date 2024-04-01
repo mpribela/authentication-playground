@@ -28,6 +28,7 @@ public class SecurityConfiguration {
                     registry.requestMatchers("/public/**").permitAll()
                             .requestMatchers("/user/login").permitAll()
                             .requestMatchers("/book/{id}/borrow").hasRole("READER")
+                            .requestMatchers("/book/register").hasRole("ADMIN")
                             .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
                 .build();

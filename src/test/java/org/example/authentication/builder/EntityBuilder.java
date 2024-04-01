@@ -4,6 +4,7 @@ import org.example.authentication.data.BookEntity;
 import org.example.authentication.data.UserEntity;
 import org.example.authentication.data.UserRole;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -22,12 +23,11 @@ public class EntityBuilder {
 
     public static BookEntity.BookEntityBuilder createBook() {
         return BookEntity.builder()
-                .id("id")
                 .author("J. K. Rowling")
                 .title("Harry Potter")
-                .borrows(0)
+                .totalBorrows(0)
                 .ISBN("ISBN")
-                .borrowedBy(null)
-                .registered(OffsetDateTime.MIN);
+                .availableCopies(2)
+                .registered(Instant.MIN);
     }
 }

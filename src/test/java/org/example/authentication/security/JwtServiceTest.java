@@ -5,18 +5,18 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.example.authentication.data.UserEntity;
-import org.example.authentication.exception.JwtTokenCreationException;
-import org.example.authentication.exception.JwtTokenIsEmptyException;
+import org.example.authentication.exception.jwt.JwtTokenCreationException;
+import org.example.authentication.exception.jwt.JwtTokenIsEmptyException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Duration;
 
 import static org.example.authentication.builder.EntityBuilder.createUser;
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +33,7 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService(Algorithm.none(), verifier, "issuer");
+        jwtService = new JwtService(Algorithm.none(), verifier, "issuer", Duration.ofMinutes(5));
     }
 
     @Test

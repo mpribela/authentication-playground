@@ -2,12 +2,14 @@ package org.example.authentication.data;
 
 
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
-import org.example.authentication.exception.BookAlreadyBorrowedException;
+import org.example.authentication.exception.book.BookAlreadyBorrowedException;
+import org.example.authentication.exception.book.BookNotAvailableException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -16,27 +18,48 @@ import java.time.OffsetDateTime;
 @Document("book")
 public class BookEntity {
     @Id
-    private String id;
+    private String ISBN;
     private String title;
     private String author;
-    private OffsetDateTime registered;
-    private int borrows;
-    private String ISBN;
-    private String borrowedBy;
+    private Instant registered;
+    private int availableCopies;
+    @Getter(AccessLevel.NONE)
+    @Builder.Default
+    private List<BorrowEntity> currentBorrows = new ArrayList<>();
+    @Builder.Default
+    private int totalBorrows = 0;
 
     public void borrow(String userId) {
-        if (StringUtils.isNotBlank(this.borrowedBy)) {
-            throw new BookAlreadyBorrowedException(this.id);
+        if (availableCopies == 0) {
+            throw new BookNotAvailableException(this.ISBN);
         }
-        borrowedBy = userId;
-        borrows++;
+        if (isBorrowedBy(userId)) {
+            throw new BookAlreadyBorrowedException(this.ISBN, userId);
+        }
+        currentBorrows.add(new BorrowEntity(userId));
+        totalBorrows++;
+        availableCopies--;
     }
 
-    public boolean returnBook() {
-        if (StringUtils.isBlank(borrowedBy)) {
+    public boolean returnBook(String userId) {
+        BorrowEntity borrow = new BorrowEntity(userId);
+        if (!isBorrowedBy(userId)) {
             return false;
         }
-        borrowedBy = null;
+        currentBorrows.remove(borrow);
+        availableCopies++;
         return true;
+    }
+
+    public boolean isBorrowedBy(String userId) {
+        BorrowEntity borrow = new BorrowEntity(userId);
+        if (currentBorrows == null) {
+            currentBorrows = new ArrayList<>();
+        }
+        return currentBorrows.contains(borrow);
+    }
+
+    public void addCopies(int copies) {
+        this.availableCopies+=copies;
     }
 }

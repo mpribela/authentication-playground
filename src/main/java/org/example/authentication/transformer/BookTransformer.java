@@ -2,16 +2,22 @@ package org.example.authentication.transformer;
 
 import org.example.authentication.data.BookEntity;
 import org.example.authentication.dto.BookDto;
+import org.example.authentication.dto.RegisterBookDto;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 
 @Component
 public class BookTransformer {
 
-    public BookEntity toEntity(BookDto bookDto) {
+    public BookEntity toEntity(RegisterBookDto registerBookDto) {
         return BookEntity.builder()
-                .title(bookDto.title())
-                .author(bookDto.author())
-                .ISBN(bookDto.ISBN())
+                .title(registerBookDto.title())
+                .author(registerBookDto.author())
+                .ISBN(registerBookDto.ISBN())
+                .totalBorrows(0)
+                .registered(Instant.now())
+                .availableCopies(registerBookDto.copies())
                 .build();
     }
 
@@ -20,6 +26,7 @@ public class BookTransformer {
                 .author(bookEntity.getAuthor())
                 .ISBN(bookEntity.getISBN())
                 .title(bookEntity.getTitle())
+                .availableCopies(bookEntity.getAvailableCopies())
                 .build();
     }
 }
