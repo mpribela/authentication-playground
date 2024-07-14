@@ -35,11 +35,13 @@ public class BookController {
     }
 
     @GetMapping(value = "/{ISBN}/exists")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void existsBook(@PathVariable("ISBN") String ISBN) {
         bookService.exists(ISBN);
     }
 
     @PostMapping(value = "/register")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void registerBook(@RequestBody RegisterBookDto registerBookDTO) {
         bookService.registerBook(registerBookDTO);
     }

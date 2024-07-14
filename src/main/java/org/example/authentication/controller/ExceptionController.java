@@ -20,14 +20,14 @@ public class ExceptionController {
     @ExceptionHandler(BookNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDto handleBookNotFoundException(BookNotFoundException exception) {
-        String errorMessage = MessageFormat.format("Book with id {0} not found.", exception.getISBN());
+        String errorMessage = MessageFormat.format("Book with ISBN {0} not found.", exception.getISBN());
         return ErrorDto.builder().message(errorMessage).build();
     }
 
     @ExceptionHandler(BookNotAvailableException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorDto handleBookAlreadyBorrowedException(BookNotAvailableException exception) {
-        String errorMessage = MessageFormat.format("Book with id {0} is already borrowed.", exception.getISBN());
+        String errorMessage = MessageFormat.format("Book with ISBN {0} is already borrowed.", exception.getISBN());
         return ErrorDto.builder().message(errorMessage).build();
     }
 
