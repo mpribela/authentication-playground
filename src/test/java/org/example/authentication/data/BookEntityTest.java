@@ -1,7 +1,7 @@
 package org.example.authentication.data;
 
 import org.example.authentication.exception.book.BookAlreadyBorrowedException;
-import org.example.authentication.exception.book.BookNotAvailableException;
+import org.example.authentication.exception.book.BookHasNoAvailableCopyException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +47,7 @@ class BookEntityTest {
                 .build();
 
         //when
-        assertThrows(BookNotAvailableException.class, () -> book.borrow(userId));
+        assertThrows(BookHasNoAvailableCopyException.class, () -> book.borrow(userId));
     }
 
     @Test

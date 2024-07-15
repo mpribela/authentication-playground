@@ -2,6 +2,7 @@ package org.example.authentication.integration.endpoint;
 
 
 import org.example.authentication.data.BookEntity;
+import org.example.authentication.data.BorrowEntity;
 import org.example.authentication.repository.BookRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,27 +14,21 @@ import org.springframework.http.MediaType;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.authentication.security.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegrationTest {
 
     @Autowired
     BookRepository bookRepository;
 
-    BookEntity harryPotterBook = BookEntity.builder()
-            .title("Harry Potter and the Philosopher's Stone")
-            .author("J.K. Rowling")
-            .ISBN("9781408855652")
-            .totalBorrows(0)
-            .registered(Instant.from(OffsetDateTime.of(2024, 7, 14, 16, 53, 12, 0, ZoneOffset.UTC)))
-            .availableCopies(1)
-            .build();
+    BookEntity harryPotterBook = createBook().build();
 
     @AfterEach
     void tearDown() {
@@ -106,8 +101,145 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
                     .andExpect(status().isNoContent());
 
             //then
-            BookEntity bookEntity = bookRepository.findByISBN(harryPotterBook.getISBN()).get();
-            assertThat(bookEntity.getAvailableCopies()).isEqualTo(3);
+            BookEntity bookInDatabase = bookRepository.findByISBN(harryPotterBook.getISBN()).get();
+            assertThat(bookInDatabase.getAvailableCopies()).isEqualTo(3);
         }
+    }
+
+    @Nested
+    class BorrowBook {
+
+        @Test
+        @DisplayName("when book exists and there is available copy and book is not borrowed already by the user " +
+                "then the book is borrowed")
+        void test() throws Exception {
+            //given
+            bookRepository.save(harryPotterBook);
+
+            //when then
+            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/borrow")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpectAll(
+                            jsonPath("$.title").value("Harry Potter and the Philosopher's Stone"),
+                            jsonPath("$.author").value("J.K. Rowling"),
+                            jsonPath("$.ISBN").value("9781408855652"),
+                            jsonPath("$.availableCopies").value(0));
+
+            BookEntity bookInDatabase = bookRepository.findByISBN(harryPotterBook.getISBN()).get();
+            assertThat(bookInDatabase.isBorrowedBy("1")).isTrue();
+            assertThat(bookInDatabase.getTotalBorrows()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("when book does not exist then return 404")
+        void test2() throws Exception {
+            //when then
+            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/borrow")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().json("{'message':'Book with ISBN 9781408855652 not found.'}"));
+        }
+
+        @Test
+        @DisplayName("when book has no available copies then return 404")
+        void test3() throws Exception {
+            //given
+            BookEntity book = createBook()
+                    .availableCopies(0)
+                    .build();
+            bookRepository.save(book);
+
+            //when then
+            mockMvc.perform(post("/book/" + book.getISBN() + "/borrow")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().json("{'message':'Book with ISBN 9781408855652 has no available copy.'}"));
+        }
+
+        @Test
+        @DisplayName("when book is already borrowed by the user then return 409")
+        void test4() throws Exception {
+            //given
+            BookEntity book = createBook()
+                    .currentBorrows(List.of(new BorrowEntity("1")))
+                    .build();
+            bookRepository.save(book);
+
+            //when then
+            mockMvc.perform(post("/book/" + book.getISBN() + "/borrow")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isConflict())
+                    .andExpect(content().json("{'message':'Book with ISBN 9781408855652 is already borrowed.'}"));
+        }
+    }
+
+    @Nested
+    class ReturnBook {
+        @Test
+        @DisplayName("when book exists and is borrowed by the user then return book")
+        void test() throws Exception {
+            //given
+            BookEntity book = createBook()
+                    .currentBorrows(List.of(new BorrowEntity("1")))
+                    .availableCopies(3)
+                    .build();
+            bookRepository.save(book);
+
+            //when then
+            mockMvc.perform(post("/book/" + book.getISBN() + "/return")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
+
+            BookEntity bookInDatabase = bookRepository.findByISBN(book.getISBN()).get();
+            assertThat(bookInDatabase.getAvailableCopies()).isEqualTo(4);
+            assertThat(bookInDatabase.isBorrowedBy("1")).isFalse();
+        }
+
+        @Test
+        @DisplayName("when book does not exist then return 404")
+        void test2() throws Exception {
+            //when then
+            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/return")
+                            .requestAttr(USER_ID_ATTRIBUTE, "1"))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @DisplayName("when book exists but is not borrowed by the user then book is not returned and 204 is returned")
+        void test3() throws Exception {
+            //given
+            BookEntity book = createBook()
+                    .currentBorrows(List.of(new BorrowEntity("1")))
+                    .availableCopies(3)
+                    .build();
+            bookRepository.save(book);
+
+            //when then
+            mockMvc.perform(post("/book/" + book.getISBN() + "/return")
+                            .requestAttr(USER_ID_ATTRIBUTE, "2"))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
+
+            BookEntity bookInDatabase = bookRepository.findByISBN(book.getISBN()).get();
+            assertThat(bookInDatabase.getAvailableCopies()).isEqualTo(3);
+            assertThat(bookInDatabase.isBorrowedBy("1")).isTrue();
+        }
+    }
+
+    private BookEntity.BookEntityBuilder createBook() {
+        return BookEntity.builder()
+                .title("Harry Potter and the Philosopher's Stone")
+                .author("J.K. Rowling")
+                .ISBN("9781408855652")
+                .totalBorrows(0)
+                .registered(Instant.from(OffsetDateTime.of(2024, 7, 14, 16, 53, 12, 0, ZoneOffset.UTC)))
+                .availableCopies(1);
     }
 }

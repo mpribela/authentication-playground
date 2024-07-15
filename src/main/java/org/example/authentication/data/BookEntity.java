@@ -3,7 +3,7 @@ package org.example.authentication.data;
 
 import lombok.*;
 import org.example.authentication.exception.book.BookAlreadyBorrowedException;
-import org.example.authentication.exception.book.BookNotAvailableException;
+import org.example.authentication.exception.book.BookHasNoAvailableCopyException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,7 +31,7 @@ public class BookEntity {
 
     public void borrow(String userId) {
         if (availableCopies == 0) {
-            throw new BookNotAvailableException(this.ISBN);
+            throw new BookHasNoAvailableCopyException(this.ISBN);
         }
         if (isBorrowedBy(userId)) {
             throw new BookAlreadyBorrowedException(this.ISBN, userId);

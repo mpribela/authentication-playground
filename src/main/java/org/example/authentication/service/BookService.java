@@ -46,7 +46,7 @@ public class BookService {
             bookRepository.save(book);
             log.info("Book with ISBN {} successfully returned by the user {}.", ISBN, userId);
         } else {
-            log.info("Book with ISBN {} is already returned by the user {}.", ISBN, userId);
+            log.info("Book with ISBN {} is not borrowed by the user {} and therefore is not returned.", ISBN, userId);
         }
     }
 

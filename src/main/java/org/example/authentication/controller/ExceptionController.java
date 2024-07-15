@@ -2,7 +2,8 @@ package org.example.authentication.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.ErrorDto;
-import org.example.authentication.exception.book.BookNotAvailableException;
+import org.example.authentication.exception.book.BookAlreadyBorrowedException;
+import org.example.authentication.exception.book.BookHasNoAvailableCopyException;
 import org.example.authentication.exception.book.BookNotFoundException;
 import org.example.authentication.exception.jwt.JwtTokenCreationException;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,17 @@ public class ExceptionController {
         return ErrorDto.builder().message(errorMessage).build();
     }
 
-    @ExceptionHandler(BookNotAvailableException.class)
+    @ExceptionHandler(BookHasNoAvailableCopyException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDto handleBookHasNoAvailableCopyException(BookHasNoAvailableCopyException exception) {
+        String errorMessage = MessageFormat.format("Book with ISBN {0} has no available copy.", exception.getISBN());
+        return ErrorDto.builder().message(errorMessage).build();
+    }
+
+
+    @ExceptionHandler(BookAlreadyBorrowedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorDto handleBookAlreadyBorrowedException(BookNotAvailableException exception) {
+    public ErrorDto handleBookAlreadyBorrowedException(BookAlreadyBorrowedException exception) {
         String errorMessage = MessageFormat.format("Book with ISBN {0} is already borrowed.", exception.getISBN());
         return ErrorDto.builder().message(errorMessage).build();
     }
