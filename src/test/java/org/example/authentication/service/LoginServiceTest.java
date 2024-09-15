@@ -1,4 +1,4 @@
-package org.example.authentication.security;
+package org.example.authentication.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.authentication.builder.EntityBuilder;

@@ -1,4 +1,4 @@
-package org.example.authentication.security;
+package org.example.authentication.service;
 
 import org.example.authentication.builder.EntityBuilder;
 import org.example.authentication.data.UserEntity;

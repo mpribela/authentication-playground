@@ -3,6 +3,7 @@ package org.example.authentication.integration.endpoint;
 
 import org.example.authentication.data.BookEntity;
 import org.example.authentication.data.BorrowEntity;
+import org.example.authentication.integration.base.NoAuthenticationBase;
 import org.example.authentication.repository.BookRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,24 +12,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.authentication.security.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
+import static org.example.authentication.builder.EntityBuilder.createBook;
+import static org.example.authentication.filter.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegrationTest {
+public class BookEndpointIntegrationTest extends NoAuthenticationBase {
 
     @Autowired
     BookRepository bookRepository;
-
-    BookEntity harryPotterBook = createBook().build();
 
     @AfterEach
     void tearDown() {
@@ -42,10 +39,11 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @DisplayName("when book exists then return 204")
         void test() throws Exception {
             //given
-            bookRepository.save(harryPotterBook);
+            BookEntity book = createBook().build();
+            bookRepository.save(book);
 
             //when then
-            mockMvc.perform(get("/book/" + harryPotterBook.getISBN() + "/exists"))
+            mockMvc.perform(get("/book/" + book.getISBN() + "/exists"))
                     .andDo(print())
                     .andExpect(status().isNoContent());
         }
@@ -54,7 +52,7 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @DisplayName("when book does not exists then return 404")
         void test2() throws Exception {
             //when then
-            mockMvc.perform(get("/book/" + harryPotterBook.getISBN() + "/exists"))
+            mockMvc.perform(get("/book/9781408855652/exists"))
                     .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(content().json("{'message':'Book with ISBN 9781408855652 not found.'}"));
@@ -67,15 +65,12 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @Test
         @DisplayName("when the book is not registered then register the book")
         void test() throws Exception {
+            //given
+            BookEntity book = createBook().build();
+
             //when then
             mockMvc.perform(post("/book/register")
-                            .content("""
-                                    {
-                                        "title": "Harry Potter and the Philosopher's Stone",
-                                        "author" : "J.K. Rowling",
-                                        "ISBN": "9781408855652",
-                                        "copies": 2
-                                    }""")
+                            .content(objectMapper.writeValueAsString(book))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNoContent());
@@ -85,23 +80,18 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @DisplayName("when the book is registered then update the available copies of the book")
         void test2() throws Exception {
             //given
-            bookRepository.save(harryPotterBook);
+            BookEntity book = createBook().build();
+            bookRepository.save(book);
 
             //when
             mockMvc.perform(post("/book/register")
-                            .content("""
-                                    {
-                                        "title": "Harry Potter and the Philosopher's Stone",
-                                        "author" : "J.K. Rowling",
-                                        "ISBN": "9781408855652",
-                                        "copies": 2
-                                    }""")
+                            .content(objectMapper.writeValueAsString(book))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNoContent());
 
             //then
-            BookEntity bookInDatabase = bookRepository.findByISBN(harryPotterBook.getISBN()).get();
+            BookEntity bookInDatabase = bookRepository.findByISBN(book.getISBN()).get();
             assertThat(bookInDatabase.getAvailableCopies()).isEqualTo(3);
         }
     }
@@ -114,10 +104,11 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
                 "then the book is borrowed")
         void test() throws Exception {
             //given
-            bookRepository.save(harryPotterBook);
+            BookEntity book = createBook().build();
+            bookRepository.save(book);
 
             //when then
-            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/borrow")
+            mockMvc.perform(post("/book/" + book.getISBN() + "/borrow")
                             .requestAttr(USER_ID_ATTRIBUTE, "1"))
                     .andDo(print())
                     .andExpect(status().isOk())
@@ -127,7 +118,7 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
                             jsonPath("$.ISBN").value("9781408855652"),
                             jsonPath("$.availableCopies").value(0));
 
-            BookEntity bookInDatabase = bookRepository.findByISBN(harryPotterBook.getISBN()).get();
+            BookEntity bookInDatabase = bookRepository.findByISBN(book.getISBN()).get();
             assertThat(bookInDatabase.isBorrowedBy("1")).isTrue();
             assertThat(bookInDatabase.getTotalBorrows()).isEqualTo(1);
         }
@@ -136,7 +127,7 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @DisplayName("when book does not exist then return 404")
         void test2() throws Exception {
             //when then
-            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/borrow")
+            mockMvc.perform(post("/book/9781408855652/borrow")
                             .requestAttr(USER_ID_ATTRIBUTE, "1"))
                     .andDo(print())
                     .andExpect(status().isNotFound())
@@ -205,10 +196,11 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
         @DisplayName("when book does not exist then return 404")
         void test2() throws Exception {
             //when then
-            mockMvc.perform(post("/book/" + harryPotterBook.getISBN() + "/return")
+            mockMvc.perform(post("/book/9781408855652/return")
                             .requestAttr(USER_ID_ATTRIBUTE, "1"))
                     .andDo(print())
-                    .andExpect(status().isNotFound());
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().json("{'message':'Book with ISBN 9781408855652 not found.'}"));
         }
 
         @Test
@@ -231,15 +223,5 @@ public class BookEndpointIntegrationTest extends NoAuthenticationEndpointIntegra
             assertThat(bookInDatabase.getAvailableCopies()).isEqualTo(3);
             assertThat(bookInDatabase.isBorrowedBy("1")).isTrue();
         }
-    }
-
-    private BookEntity.BookEntityBuilder createBook() {
-        return BookEntity.builder()
-                .title("Harry Potter and the Philosopher's Stone")
-                .author("J.K. Rowling")
-                .ISBN("9781408855652")
-                .totalBorrows(0)
-                .registered(Instant.from(OffsetDateTime.of(2024, 7, 14, 16, 53, 12, 0, ZoneOffset.UTC)))
-                .availableCopies(1);
     }
 }

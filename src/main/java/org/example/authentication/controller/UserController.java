@@ -3,8 +3,8 @@ package org.example.authentication.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.TokenDto;
-import org.example.authentication.security.JwtService;
-import org.example.authentication.security.LoginService;
+import org.example.authentication.service.JwtService;
+import org.example.authentication.service.LoginService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

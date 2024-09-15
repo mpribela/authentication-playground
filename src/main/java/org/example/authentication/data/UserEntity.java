@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -25,8 +25,8 @@ public class UserEntity implements UserDetails {
     private String username;
     private String password;
     private List<UserRole> userRoles;
-    private OffsetDateTime created;
-    private OffsetDateTime lastLogin;
+    private Instant created;
+    private Instant lastLogin;
     private boolean enabled;
 
     public UserEntity(String id, String username, List<String> userRoles, boolean isEnabled) {

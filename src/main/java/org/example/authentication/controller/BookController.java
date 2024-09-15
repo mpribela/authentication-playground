@@ -7,7 +7,7 @@ import org.example.authentication.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import static org.example.authentication.security.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
+import static org.example.authentication.filter.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
 
 @Slf4j
 @RestController

@@ -1,4 +1,4 @@
-package org.example.authentication.security;
+package org.example.authentication.service;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;

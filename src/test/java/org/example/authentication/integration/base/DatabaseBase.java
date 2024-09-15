@@ -1,4 +1,4 @@
-package org.example.authentication.integration;
+package org.example.authentication.integration.base;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

@@ -1,4 +1,4 @@
-package org.example.authentication.security;
+package org.example.authentication.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.data.UserEntity;

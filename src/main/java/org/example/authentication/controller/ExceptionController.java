@@ -1,5 +1,6 @@
 package org.example.authentication.controller;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.dto.ErrorDto;
 import org.example.authentication.exception.book.BookAlreadyBorrowedException;
@@ -48,10 +49,10 @@ public class ExceptionController {
         return ErrorDto.builder().message(errorMessage).build();
     }
 
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorDto handleException(Exception throwable) {
-//        log.error("Unknown error occurred.", throwable);
-//        return ErrorDto.builder().message("Unknown error occurred.").build();
-//    }
+    @ExceptionHandler(TokenExpiredException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDto handleException(TokenExpiredException throwable) {
+        log.error("Unknown error occurred.", throwable);
+        return ErrorDto.builder().message("Unknown error occurred.").build();
+    }
 }
