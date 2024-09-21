@@ -3,6 +3,7 @@ package org.example.authentication.integration.endpoint;
 
 import org.example.authentication.data.BookEntity;
 import org.example.authentication.data.BorrowEntity;
+import org.example.authentication.dto.RegisterBookDto;
 import org.example.authentication.integration.base.NoAuthenticationBase;
 import org.example.authentication.repository.BookRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.authentication.builder.EntityBuilder.createBook;
@@ -22,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class BookEndpointIntegrationTest extends NoAuthenticationBase {
+public class BookIntegrationTest extends NoAuthenticationBase {
 
     @Autowired
     BookRepository bookRepository;
@@ -67,25 +69,40 @@ public class BookEndpointIntegrationTest extends NoAuthenticationBase {
         void test() throws Exception {
             //given
             BookEntity book = createBook().build();
+            RegisterBookDto bookDto = RegisterBookDto.builder()
+                    .title(book.getTitle())
+                    .ISBN(book.getISBN())
+                    .author(book.getAuthor())
+                    .copies(book.getAvailableCopies())
+                    .build();
 
             //when then
             mockMvc.perform(post("/book/register")
-                            .content(objectMapper.writeValueAsString(book))
+                            .content(objectMapper.writeValueAsString(bookDto))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNoContent());
+
+            Optional<BookEntity> bookInDatabase = bookRepository.findByISBN(book.getISBN());
+            assertThat(bookInDatabase).isPresent();
         }
 
         @Test
         @DisplayName("when the book is registered then update the available copies of the book")
         void test2() throws Exception {
             //given
-            BookEntity book = createBook().build();
+            BookEntity book = createBook().availableCopies(2).build();
             bookRepository.save(book);
+            RegisterBookDto bookDto = RegisterBookDto.builder()
+                    .title(book.getTitle())
+                    .ISBN(book.getISBN())
+                    .author(book.getAuthor())
+                    .copies(1)
+                    .build();
 
             //when
             mockMvc.perform(post("/book/register")
-                            .content(objectMapper.writeValueAsString(book))
+                            .content(objectMapper.writeValueAsString(bookDto))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNoContent());
