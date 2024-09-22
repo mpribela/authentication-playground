@@ -37,6 +37,7 @@ public class AuthenticationBase extends DatabaseBase {
     protected static final String EXPIRED_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZXN0LWlzc3VlciIsImlhdCI6MTcyMzM5ODA3MywiZXhwIjoxNzIzNDAxNjczLCJ1c2VyIjoiYWRtaW4iLCJ1c2VySWQiOiI2NmI4ZjdiNmJkNWEyMDIzNmJjMzQ4ZWQiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlzRW5hYmxlZCI6dHJ1ZX0.nWLV7BA5QCzefX9eQowuL0U616uH57vTDasU-bayppzQnDDGEVEEIBV_2OGIBfbsQ95IcBhGqsh36navnckptg_HijwuMmWoDDxIKaEIIvCYmkSpJGn4mdBsgVk6YbCfqhkf5qxF5fIe2qlRjnKMYgnZhuXgXpwgjZcwlWsrmXZ_0ejzA5o_QT_7ZOVdo078rkGaIPRfd-Y5XHqCXEoRri8_2SvlBGuDAtZiljtHnMj-PNYTmcnT2wj92OiqHRvkj0t9qKRtYsQnaQnDNH5O52oJNoukUqUWoWlXXXWIhL3jx-yYANfLtJt7Ca6s_FL7ZmeARRmeQnVLinG-JM0o5Q";
 
     protected UserEntity reader = createUser().username("reader").userRoles(List.of(ROLE_READER)).build();
+    protected UserEntity userWithoutRoles = createUser().username("userWithoutRoles").userRoles(List.of()).build();
     protected UserEntity admin = createUser().username("admin").userRoles(List.of(ROLE_ADMIN)).build();
     protected UserEntity director = createUser().username("director").userRoles(List.of(ROLE_ADMIN, ROLE_READER)).build();
 

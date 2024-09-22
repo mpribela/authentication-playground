@@ -1,6 +1,7 @@
 package org.example.authentication.service;
 
 import org.example.authentication.data.BookEntity;
+import org.example.authentication.dto.BookAvailabilityDto;
 import org.example.authentication.dto.BookDto;
 import org.example.authentication.dto.RegisterBookDto;
 import org.example.authentication.exception.book.BookNotFoundException;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -32,33 +34,35 @@ class BookServiceTest {
 
     String bookISBN = "123";
     String userId = "456";
+    BookEntity bookMock = mock(BookEntity.class);
+    BookDto bookDtoMock = mock(BookDto.class);
 
     @Test
     @DisplayName("when book exists then do not throw exception")
-    void existsTest1() {
+    void isAvailableTest1() {
         //given
-        given(bookRepository.existsByISBN(bookISBN)).willReturn(true);
+        given(bookMock.getAvailableCopies()).willReturn(2);
+        given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.of(bookMock));
 
         //when then
-        assertDoesNotThrow(() -> bookService.exists(bookISBN));
+        BookAvailabilityDto result = assertDoesNotThrow(() -> bookService.isAvailable(bookISBN));
+        assertThat(result.availableCopies()).isEqualTo(2);
     }
 
     @Test
     @DisplayName("when book does not exist then throw exception")
-    void existsTest2() {
+    void isAvailableTest2() {
         //given
-        given(bookRepository.existsByISBN(bookISBN)).willReturn(false);
+        given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.empty());
 
         //when then
-        assertThrows(BookNotFoundException.class, () -> bookService.exists(bookISBN));
+        assertThrows(BookNotFoundException.class, () -> bookService.isAvailable(bookISBN));
     }
 
     @Test
     @DisplayName("when book exists then book is borrowed")
     void borrowBookTest1() {
         //given
-        BookEntity bookMock = mock(BookEntity.class);
-        BookDto bookDtoMock = mock(BookDto.class);
         given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.of(bookMock));
         given(bookTransformer.toDTO(bookMock)).willReturn(bookDtoMock);
 
@@ -86,7 +90,6 @@ class BookServiceTest {
     @DisplayName("when book exists and is returned then database is updated")
     void returnBookTest1() {
         //given
-        BookEntity bookMock = mock(BookEntity.class);
         given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.of(bookMock));
         given(bookMock.returnBook(userId)).willReturn(true);
 
@@ -102,7 +105,6 @@ class BookServiceTest {
     @DisplayName("when book exists and is not returned then database is not updated")
     void returnBookTest2() {
         //given
-        BookEntity bookMock = mock(BookEntity.class);
         given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.of(bookMock));
         given(bookMock.returnBook(userId)).willReturn(false);
 

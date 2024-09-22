@@ -35,26 +35,27 @@ public class BookIntegrationTest extends NoAuthenticationBase {
     }
 
     @Nested
-    class ExistsBook {
+    class BookAvailability {
 
         @Test
         @DisplayName("when book exists then return 204")
         void test() throws Exception {
             //given
-            BookEntity book = createBook().build();
+            BookEntity book = createBook().availableCopies(3).build();
             bookRepository.save(book);
 
             //when then
-            mockMvc.perform(get("/book/" + book.getISBN() + "/exists"))
+            mockMvc.perform(get("/book/" + book.getISBN() + "/available"))
                     .andDo(print())
-                    .andExpect(status().isNoContent());
+                    .andExpect(status().isOk())
+                    .andExpect(content().json("{'availableCopies': 3}"));
         }
 
         @Test
         @DisplayName("when book does not exists then return 404")
         void test2() throws Exception {
             //when then
-            mockMvc.perform(get("/book/9781408855652/exists"))
+            mockMvc.perform(get("/book/9781408855652/available"))
                     .andDo(print())
                     .andExpect(status().isNotFound())
                     .andExpect(content().json("{'message':'Book with ISBN 9781408855652 not found.'}"));
