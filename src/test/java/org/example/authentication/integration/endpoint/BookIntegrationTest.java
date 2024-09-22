@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.authentication.builder.EntityBuilder.createBook;
+import static org.example.authentication.util.builder.EntityBuilder.createBook;
 import static org.example.authentication.filter.JwtAuthenticationFilter.USER_ID_ATTRIBUTE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

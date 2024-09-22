@@ -14,7 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
-import static org.example.authentication.builder.EntityBuilder.createUser;
+import static org.example.authentication.util.builder.EntityBuilder.createUser;
 import static org.example.authentication.data.UserRole.ROLE_ADMIN;
 import static org.example.authentication.data.UserRole.ROLE_READER;
 

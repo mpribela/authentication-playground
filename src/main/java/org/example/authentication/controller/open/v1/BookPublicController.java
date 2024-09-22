@@ -16,7 +16,7 @@ public class BookPublicController {
     }
 
     @GetMapping(value = "/{ISBN}/available")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public BookAvailabilityDto isBookAvailable(@PathVariable("ISBN") String ISBN) {
         return bookService.isAvailable(ISBN);
     }

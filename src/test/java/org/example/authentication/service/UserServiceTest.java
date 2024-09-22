@@ -1,8 +1,8 @@
 package org.example.authentication.service;
 
-import org.example.authentication.builder.EntityBuilder;
 import org.example.authentication.data.UserEntity;
 import org.example.authentication.repository.UserRepository;
+import org.example.authentication.util.builder.EntityBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

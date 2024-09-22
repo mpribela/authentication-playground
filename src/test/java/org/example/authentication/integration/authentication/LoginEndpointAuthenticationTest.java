@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.example.authentication.builder.EntityBuilder.createUser;
+import static org.example.authentication.util.builder.EntityBuilder.createUser;
 
 public class LoginEndpointAuthenticationTest extends AuthenticationBase {
 

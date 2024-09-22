@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.*;
 
-import java.text.MessageFormat;
-
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.example.authentication.builder.EntityBuilder.createBook;
+import static org.example.authentication.util.EndpointHelper.createHttpEntity;
+import static org.example.authentication.util.EndpointHelper.createUrl;
+import static org.example.authentication.util.builder.EntityBuilder.createBook;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
@@ -282,13 +282,5 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         }
     }
 
-    private HttpEntity<BookDto> createHttpEntity(String token, BookDto book) {
-        var headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        return new HttpEntity<>(book, headers);
-    }
 
-    private String createUrl(String url, String isbn) {
-        return MessageFormat.format(url, isbn);
-    }
 }

@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 
-import static org.example.authentication.builder.EntityBuilder.createUser;
+import static org.example.authentication.util.builder.EntityBuilder.createUser;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
