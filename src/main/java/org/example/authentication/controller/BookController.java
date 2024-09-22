@@ -1,6 +1,7 @@
 package org.example.authentication.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.authentication.dto.BookAvailabilityDto;
 import org.example.authentication.dto.BookDto;
 import org.example.authentication.dto.RegisterBookDto;
 import org.example.authentication.service.BookService;
@@ -34,10 +35,10 @@ public class BookController {
         bookService.returnBook(ISBN, userId);
     }
 
-    @GetMapping(value = "/{ISBN}/exists")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void existsBook(@PathVariable("ISBN") String ISBN) {
-        bookService.exists(ISBN);
+    @GetMapping(value = "/{ISBN}/available")
+    @ResponseStatus(HttpStatus.OK)
+    public BookAvailabilityDto isBookAvailable(@PathVariable("ISBN") String ISBN) {
+        return bookService.isAvailable(ISBN);
     }
 
     @PostMapping(value = "/register")

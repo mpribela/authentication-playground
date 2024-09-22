@@ -2,6 +2,7 @@ package org.example.authentication.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.authentication.data.BookEntity;
+import org.example.authentication.dto.BookAvailabilityDto;
 import org.example.authentication.dto.BookDto;
 import org.example.authentication.dto.RegisterBookDto;
 import org.example.authentication.exception.book.BookNotFoundException;
@@ -23,16 +24,18 @@ public class BookService {
         this.bookTransformer = bookTransformer;
     }
 
-    public void exists(String ISBN) {
-        boolean exists = bookRepository.existsByISBN(ISBN);
-        if (!exists) {
-            throw new BookNotFoundException(ISBN);
-        }
+    public BookAvailabilityDto isAvailable(String ISBN) {
+        BookEntity book = bookRepository.findByISBN(ISBN)
+                .orElseThrow(() -> new BookNotFoundException(ISBN));
+        return BookAvailabilityDto.builder()
+                .availableCopies(book.getAvailableCopies())
+                .build();
     }
 
     //todo make it transactional
     public BookDto borrowBook(String ISBN, String userId) {
-        BookEntity book = bookRepository.findByISBN(ISBN).orElseThrow(() -> new BookNotFoundException(ISBN));
+        BookEntity book = bookRepository.findByISBN(ISBN)
+                .orElseThrow(() -> new BookNotFoundException(ISBN));
         book.borrow(userId);
         bookRepository.save(book);
         return bookTransformer.toDTO(book);
