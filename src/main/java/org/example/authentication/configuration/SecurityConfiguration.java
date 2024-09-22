@@ -27,9 +27,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(registry ->
                     registry.requestMatchers("/public/**").permitAll()
                             .requestMatchers("/user/login").permitAll()
-                            .requestMatchers("/book/{id}/borrow").hasRole("READER")
+                            .requestMatchers("/book/{ISBN}/return", "/book/{ISBN}/borrow", "/book/{ISBN}/available").hasRole("READER")
                             .requestMatchers("/book/register").hasRole("ADMIN")
-                            .anyRequest().authenticated())
+                            .anyRequest().denyAll())
                 .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
                 .build();
     }
