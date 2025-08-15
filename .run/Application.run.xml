@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Application" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="org.example.authentication.Application" />
-    <module name="authentication" />
+    <option name="MAIN_CLASS_NAME" value="org.example.library.Application" />
+    <module name="library" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="org.example.authentication.*" />
+        <option name="PATTERN" value="org.example.library.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
