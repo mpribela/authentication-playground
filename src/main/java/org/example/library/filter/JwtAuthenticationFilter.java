@@ -37,12 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.isBlank(authorizationHeader) || !StringUtils.startsWith(authorizationHeader, BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
+        } else {
+            String token = StringUtils.removeStart(authorizationHeader, BEARER_PREFIX);
+            UserEntity user = jwtService.getUser(token);
+            request.setAttribute(USER_ID_ATTRIBUTE, user.getId());
+            setSecurityContext(user);
+            filterChain.doFilter(request, response);
         }
-        String token = StringUtils.removeStart(authorizationHeader, BEARER_PREFIX);
-        UserEntity user = jwtService.getUser(token);
-        request.setAttribute(USER_ID_ATTRIBUTE, user.getId());
-        setSecurityContext(user);
-        filterChain.doFilter(request, response);
     }
 
     @Override

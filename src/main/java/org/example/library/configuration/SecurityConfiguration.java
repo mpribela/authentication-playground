@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
 
 @Configuration
@@ -23,14 +22,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(registry ->
-                    registry.requestMatchers("/public/**").permitAll()
-                            .requestMatchers("/user/login").permitAll()
-                            .requestMatchers("/book/{ISBN}/return", "/book/{ISBN}/borrow", "/book/{ISBN}/available").hasRole("READER")
-                            .requestMatchers("/book/register").hasRole("ADMIN")
-                            .anyRequest().denyAll())
-                .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 

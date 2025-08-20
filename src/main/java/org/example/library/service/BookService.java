@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.library.data.BookEntity;
 import org.example.library.dto.BookAvailabilityDto;
 import org.example.library.dto.BookDto;
+import org.example.library.dto.BookListDto;
 import org.example.library.dto.RegisterBookDto;
+import org.example.library.exception.book.BookAlreadyBorrowedException;
 import org.example.library.exception.book.BookNotFoundException;
 import org.example.library.repository.BookRepository;
 import org.example.library.transformer.BookTransformer;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,6 +25,12 @@ public class BookService {
     public BookService(BookRepository bookRepository, BookTransformer bookTransformer) {
         this.bookRepository = bookRepository;
         this.bookTransformer = bookTransformer;
+    }
+
+    public BookDto getBook(String ISBN) {
+        BookEntity book = bookRepository.findByISBN(ISBN)
+                .orElseThrow(() -> new BookNotFoundException(ISBN));
+        return bookTransformer.toDTO(book, false);
     }
 
     public BookAvailabilityDto isAvailable(String ISBN) {
@@ -38,7 +47,7 @@ public class BookService {
                 .orElseThrow(() -> new BookNotFoundException(ISBN));
         book.borrow(userId);
         bookRepository.save(book);
-        return bookTransformer.toDTO(book);
+        return bookTransformer.toDTO(book, true);
     }
 
     //todo make it transactional
@@ -73,6 +82,15 @@ public class BookService {
         BookEntity book = bookTransformer.toEntity(registerBookDTO);
         BookEntity insertedBook = bookRepository.insert(book);
         log.info("Registered book {}.", insertedBook);
+    }
+
+    public BookListDto getAllBooks(String userId) {
+        List<BookEntity> bookEntities = bookRepository.findAll();
+        List<BookDto> booksDto = bookEntities.stream().map(book -> {
+            boolean isBorrowedByUser = book.isBorrowedBy(userId);
+            return bookTransformer.toDTO(book, isBorrowedByUser);
+        }).toList();
+        return BookListDto.builder().books(booksDto).build();
     }
 
     /*

@@ -38,7 +38,7 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         void test() {
             //given
             String token = login(admin);
-            BookDto book = bookTransformer.toDTO(createBook().build());
+            BookDto book = bookTransformer.toDTO(createBook().build(), false);
             var httpEntity = createHttpEntity(token, book);
 
             //when
@@ -54,7 +54,7 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         void test2() {
             //given
             String jwt = login(reader);
-            BookDto book = bookTransformer.toDTO(createBook().build());
+            BookDto book = bookTransformer.toDTO(createBook().build(), false);
             var httpEntity = createHttpEntity(jwt, book);
 
             //when
@@ -69,7 +69,7 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         @DisplayName("when the token is expired then the action is forbidden")
         void test3() {
             //given
-            BookDto book = bookTransformer.toDTO(createBook().build());
+            BookDto book = bookTransformer.toDTO(createBook().build(), false);
             var httpEntity = createHttpEntity(EXPIRED_TOKEN, book);
 
             //when
@@ -84,7 +84,7 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         @DisplayName("when no authentication token si provided then the action is forbidden")
         void test4() {
             //given
-            BookDto book = bookTransformer.toDTO(createBook().build());
+            BookDto book = bookTransformer.toDTO(createBook().build(), false);
             var httpEntity = new HttpEntity<>(book);
 
             //when
@@ -99,7 +99,7 @@ public class BookEndpointAuthenticationTest extends AuthenticationBase {
         @DisplayName("when invalid authentication token si provided then the action is forbidden")
         void test5() {
             //given
-            BookDto book = bookTransformer.toDTO(createBook().build());
+            BookDto book = bookTransformer.toDTO(createBook().build(), false);
             var httpEntity = createHttpEntity("", book);
 
             //when

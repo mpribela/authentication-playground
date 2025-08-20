@@ -64,7 +64,7 @@ class BookServiceTest {
     void borrowBookTest1() {
         //given
         given(bookRepository.findByISBN(bookISBN)).willReturn(Optional.of(bookMock));
-        given(bookTransformer.toDTO(bookMock)).willReturn(bookDtoMock);
+        given(bookTransformer.toDTO(bookMock, false)).willReturn(bookDtoMock);
 
         //when
         BookDto bookDto = bookService.borrowBook(bookISBN, userId);
@@ -72,7 +72,7 @@ class BookServiceTest {
         //then
         verify(bookMock).borrow(userId);
         verify(bookRepository).save(bookMock);
-        verify(bookTransformer).toDTO(bookMock);
+        verify(bookTransformer).toDTO(bookMock, false);
         assertSame(bookDtoMock, bookDto);
     }
 

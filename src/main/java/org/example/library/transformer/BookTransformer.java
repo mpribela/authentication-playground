@@ -21,12 +21,13 @@ public class BookTransformer {
                 .build();
     }
 
-    public BookDto toDTO(BookEntity bookEntity) {
+    public BookDto toDTO(BookEntity bookEntity, boolean isBorrowedByUser) {
         return BookDto.builder()
                 .author(bookEntity.getAuthor())
                 .ISBN(bookEntity.getISBN())
                 .title(bookEntity.getTitle())
                 .availableCopies(bookEntity.getAvailableCopies())
+                .isBorrowedByUser(isBorrowedByUser)
                 .build();
     }
 }

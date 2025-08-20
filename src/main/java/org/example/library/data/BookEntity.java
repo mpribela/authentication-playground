@@ -52,6 +52,9 @@ public class BookEntity {
     }
 
     public boolean isBorrowedBy(String userId) {
+        if (userId == null) {
+            return false;
+        }
         BorrowEntity borrow = new BorrowEntity(userId);
         if (currentBorrows == null) {
             currentBorrows = new ArrayList<>();
