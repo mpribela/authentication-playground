@@ -1,7 +1,6 @@
 package org.example.library.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.library.dto.BookAvailabilityDto;
 import org.example.library.dto.BookDto;
 import org.example.library.dto.RegisterBookDto;
 import org.example.library.service.BookService;
@@ -12,7 +11,7 @@ import static org.example.library.filter.JwtAuthenticationFilter.USER_ID_ATTRIBU
 
 @Slf4j
 @RestController
-@RequestMapping("/book")
+@RequestMapping("/books")
 public class BookController {
 
     private final BookService bookService;
@@ -35,15 +34,11 @@ public class BookController {
         bookService.returnBook(ISBN, userId);
     }
 
-    @GetMapping(value = "/{ISBN}/available")
-    @ResponseStatus(HttpStatus.OK)
-    public BookAvailabilityDto isBookAvailable(@PathVariable("ISBN") String ISBN) {
-        return bookService.isAvailable(ISBN);
-    }
-
     @PostMapping(value = "/register")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void registerBook(@RequestBody RegisterBookDto registerBookDTO) {
         bookService.registerBook(registerBookDTO);
     }
+
+    //todo edit book
 }
