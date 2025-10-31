@@ -4,6 +4,7 @@ import org.example.library.dto.BookAvailabilityDto;
 import org.example.library.dto.BookDto;
 import org.example.library.dto.BookListDto;
 import org.example.library.service.BookService;
+import org.example.library.service.filter.BookFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +37,18 @@ public class BookPublicController {
     @ResponseStatus(HttpStatus.OK)
     public BookDto getBook(@PathVariable("ISBN") String ISBN) {
         return bookService.getBook(ISBN);
+    }
+
+    @GetMapping(value = "/search")
+    @ResponseStatus(HttpStatus.OK)
+    public BookListDto searchBooks(
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "ISBN", required = false) String ISBN,
+            @RequestParam(value = "author", required = false) String author) {
+        return bookService.getBookByFilter(BookFilter.builder()
+                .title(title)
+                .ISBN(ISBN)
+                .author(author)
+                .build());
     }
 }

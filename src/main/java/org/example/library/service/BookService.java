@@ -6,14 +6,17 @@ import org.example.library.dto.BookAvailabilityDto;
 import org.example.library.dto.BookDto;
 import org.example.library.dto.BookListDto;
 import org.example.library.dto.RegisterBookDto;
-import org.example.library.exception.book.BookAlreadyBorrowedException;
 import org.example.library.exception.book.BookNotFoundException;
 import org.example.library.repository.BookRepository;
+import org.example.library.service.filter.BookFilter;
 import org.example.library.transformer.BookTransformer;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.example.library.service.filter.BookFilter.*;
 
 @Slf4j
 @Component
@@ -72,6 +75,24 @@ public class BookService {
         }
     }
 
+    public BookListDto getAllBooks(String userId) {
+        List<BookEntity> bookEntities = bookRepository.findAll();
+        List<BookDto> booksDto = bookEntities.stream().map(book -> {
+            boolean isBorrowedByUser = book.isBorrowedBy(userId);
+            return bookTransformer.toDTO(book, isBorrowedByUser);
+        }).toList();
+        return BookListDto.builder().books(booksDto).build();
+    }
+
+    public BookListDto getBookByFilter(BookFilter filter) {
+        BookEntity filterEntity = bookTransformer.toEntity(filter);
+        List<BookEntity> databaseBooks = bookRepository.findAll(Example.of(filterEntity, BOOK_MATCHER));
+        List<BookDto> booksDto = databaseBooks.stream().map(book -> bookTransformer.toDTO(book, false)).toList();
+        return BookListDto.builder()
+                .books(booksDto)
+                .build();
+    }
+
     private void addCopiesOfBook(RegisterBookDto registerBookDTO, BookEntity book) {
         book.addCopies(registerBookDTO.copies());
         bookRepository.save(book);
@@ -83,19 +104,4 @@ public class BookService {
         BookEntity insertedBook = bookRepository.insert(book);
         log.info("Registered book {}.", insertedBook);
     }
-
-    public BookListDto getAllBooks(String userId) {
-        List<BookEntity> bookEntities = bookRepository.findAll();
-        List<BookDto> booksDto = bookEntities.stream().map(book -> {
-            boolean isBorrowedByUser = book.isBorrowedBy(userId);
-            return bookTransformer.toDTO(book, isBorrowedByUser);
-        }).toList();
-        return BookListDto.builder().books(booksDto).build();
-    }
-
-    /*
-    todo:
-      - search by Title
-      - search by Author
-     */
 }
